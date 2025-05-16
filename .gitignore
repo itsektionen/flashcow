@@ -1,7 +1,1 @@
-/**/bin
-/**/obj
-
-
-# Added by cargo
-
-/target
+/backend/target
