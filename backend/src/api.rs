@@ -1,8 +1,8 @@
-use std::{net::SocketAddr, sync::{atomic::{AtomicU32, Ordering}, Arc}};
-
-use axum::{body::Body, extract::State, http::{HeaderValue, StatusCode}, response::{IntoResponse, Response}, routing::get, Router};
+use std::{net::SocketAddr, sync::Arc};
+use axum::{body::Body, extract::State, http::{HeaderValue, StatusCode}, response::IntoResponse, routing::get, Router};
 use serde::Serialize;
 use serde_json::json;
+use crate::db;
 
 enum ApiError {
     JsonError(serde_json::Error),
@@ -58,23 +58,19 @@ impl<R> IntoResponse for ApiResult<R> where R: Serialize {
     }
 }
 
-#[derive(Serialize)]
-struct ApiTestResponse {
-    pub n: u32,
+async fn get_all_committees(State(ctx): State<Arc<Context>>) -> ApiResult<Vec<db::CommitteeRecord>> {
+    let all_committees = db::get_all_committees(&ctx.db_pool).await.unwrap();
+    ApiResult::Success(all_committees)
 }
 
-async fn api_test(State(state): State<Arc<CallCounter>>) -> ApiResult<ApiTestResponse> {
-    ApiResult::Success(ApiTestResponse { n: state.n.fetch_add(1, Ordering::AcqRel) })
+struct Context {
+    db_pool: db::Pool,
 }
 
-struct CallCounter {
-    pub n: AtomicU32,
-}
-
-pub async fn serve(http_addr: SocketAddr) {
+pub async fn serve(http_addr: SocketAddr, pool: db::Pool) {
     let app = Router::new()
-        .route("/api/test", get(api_test))
-        .with_state(Arc::new(CallCounter { n: 0.into() }));
+        .route("/api/committees", get(get_all_committees))
+        .with_state(Arc::new(Context { db_pool: pool }));
     
     let listener = tokio::net::TcpListener::bind(http_addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
