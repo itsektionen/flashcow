@@ -1,11 +1,37 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeftIcon, ImageUp, RotateCwIcon } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+
+import { cn } from "@/lib/utils";
+
+import { ArrowLeftIcon, CalendarIcon, ImageUp } from "lucide-react";
+import { z } from "zod";
 
 import { useState } from "react";
 
+const committees: [string] = ["QMISK", "TMEIT", "ITK", "SMN"];
+
+const ReceiptReportSchema = z.object({
+  full_name: z.string(),
+  food_sum: z.number().nonnegative(),
+  beer_sum: z.number().nonnegative(),
+  soda_sum: z.number().nonnegative(),
+  cider_sum: z.number().nonnegative(),
+  wine_sum: z.number().nonnegative(),
+  spirits_sum: z.number().nonnegative(),
+  internrep_sum: z.number().nonnegative(),
+  committee: z.enum(committees),
+});
+
 function ReceiptReport() {
+  const [date, setDate] = useState<Date>();
+
   const onImageClick = () => {
     alert(1);
   };
@@ -32,23 +58,84 @@ function ReceiptReport() {
       <div className="flex items-center justify-center m-3 grow rounded-lg mb-3" onClick={onImageClick}>
         <img src="receipt.jpg" className="rounded-lg object-contain" />
       </div>
-      <div className="flex items-center pl-3 pr-3 mb-4">
-        <Button className="h-9 mr-2 grow" variant="secondary">
+      <div className="flex items-center pl-3 pr-3 mb-4 gap-2">
+        <Button className="grow flex-1/2" variant="secondary">
           Continue
         </Button>
-        <Button size="icon" variant="destructive">
-          <RotateCwIcon />
+        <Button className="grow flex-1/2" variant="destructive">
+          Retake the photo
         </Button>
       </div>
     </>,
 
     <>
-      {/* == Select Purchase Date and Committee == */}
-      <h1 className="pt-4 ml-2 mb-1 text-xl">Who and when?</h1>
-      <p className="ml-2 mb-1 text-sm">
-        Make sure it's clearly readable, as you're responsible until cashier has accepted your report.
-      </p>
-      <Calendar></Calendar>
+      {/* == Purchase Contents == */}
+      <div className="grid gap-2">
+        <h1 className="pt-4 ml-2 text-xl">What has been bought?</h1>
+        <p className="ml-2 text-sm">Document what has been bought.</p>
+        <div className="mt-4 ml-3 mr-3">
+          <Textarea className="h-[20dvh]"></Textarea>
+        </div>
+      </div>
+    </>,
+
+    <>
+      <div className="grid gap-2">
+        {/* == Select Purchase Date and Committee == */}
+        <h1 className="pt-4 ml-2 mb-1 text-xl">Who and when?</h1>
+        <p className="ml-2 mb-1 text-sm">
+          Make sure it's clearly readable, as you're responsible until cashier has accepted your report.
+        </p>
+
+        <div className="content-center justify-center grid gap-4">
+          <div>
+            <h2>Which committee made this purchase?</h2>
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Committee" />
+              </SelectTrigger>
+              <SelectContent>
+                {committees.map((committee) => (
+                  <SelectItem value={committee}>{committee}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <h2>When was the purchase done?</h2>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-[280px] justify-start text-left font-normal",
+                    !date && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="grid gap-2">
+            <h2>Who made this purchase?</h2>
+            <Input disabled placeholder="Julle Juliusson Keuschnig" />
+            <div className="items-top flex space-x-2">
+              <Checkbox />
+              <label
+                htmlFor="terms1"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Not you?
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
     </>,
   ];
 
@@ -67,7 +154,7 @@ function ReceiptReport() {
           </Button>
           <Progress value={(100 / pages.length) * (index + 1)} className="mr-4" />
         </div>
-        {pages[index]}
+        <div className="flex grow flex-col">{pages[index]}</div>
       </div>
       <img
         src="flashcow.webp"
