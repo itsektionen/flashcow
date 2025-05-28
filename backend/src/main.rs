@@ -1,5 +1,6 @@
 mod api;
 mod db;
+mod util;
 
 #[tokio::main]
 async fn main() {
