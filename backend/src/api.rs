@@ -1,4 +1,4 @@
-use crate::db;
+use crate::db::{self, GetUserError};
 use axum::{
     body::Body,
     extract::{Path, State},
@@ -160,8 +160,8 @@ async fn get_specific_user(
 ) -> ApiResult<db::UserRecord> {
     match db::get_user_from_id(&ctx.db_pool, user_id).await {
         Ok(user_record) => ApiResult::Success(user_record),
-        Err(sqlx::Error::RowNotFound) => ApiResult::Error(ApiError::UserNotFound),
-        Err(sqlx_error) => handle_sqlx_error(sqlx_error),
+        Err(GetUserError::NotFound) => ApiResult::Error(ApiError::UserNotFound),
+        Err(GetUserError::Other(sqlx_error)) => handle_sqlx_error(sqlx_error),
     }
 }
 

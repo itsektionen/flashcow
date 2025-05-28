@@ -177,11 +177,22 @@ pub struct UserRecord {
     pub chapter_email_address: String,
 }
 
-pub async fn get_user_from_id<'e, E>(executor: E, id: i32) -> Result<UserRecord, sqlx::Error>
+#[derive(Debug)]
+pub enum GetUserError {
+    NotFound,
+    Other(sqlx::Error),
+}
+
+pub async fn get_user_from_id<'e, E>(executor: E, id: i32) -> Result<UserRecord, GetUserError>
 where
     E: Executor<'e, Database = Postgres>,
 {
-    sqlx::query_as!(UserRecord, "SELECT * FROM user_details WHERE id = $1", id)
+    match sqlx::query_as!(UserRecord, "SELECT * FROM user_details WHERE id = $1", id)
         .fetch_one(executor)
         .await
+    {
+        Ok(r) => Ok(r),
+        Err(sqlx::Error::RowNotFound) => Err(GetUserError::NotFound),
+        Err(sqlx_error) => Err(GetUserError::Other(sqlx_error)),
+    }
 }
