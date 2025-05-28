@@ -2,7 +2,8 @@ BEGIN;
 CREATE TABLE committee (
 	id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	full_name text NOT NULL,
-	short_name text NOT NULL
+	short_name text NOT NULL,
+	deleted timestamptz
 );
 
 CREATE TABLE user_details (
