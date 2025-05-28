@@ -1,6 +1,7 @@
+use crate::util::contains_duplicates;
+use chrono::{DateTime, Utc};
 use serde::Serialize;
 use sqlx::*;
-use crate::util::contains_duplicates;
 
 pub type Pool = sqlx::Pool<Postgres>;
 
@@ -16,7 +17,9 @@ pub struct CommitteeRecord {
 }
 
 pub async fn get_all_committees<'e, E>(executor: E) -> Result<Vec<CommitteeRecord>, sqlx::Error>
-    where E: Executor<'e, Database = Postgres> {
+where
+    E: Executor<'e, Database = Postgres>,
+{
     sqlx::query_as!(
         CommitteeRecord,
         "
@@ -41,7 +44,11 @@ impl From<sqlx::Error> for AddCommitteeError {
     }
 }
 
-pub async fn add_committee(pool: &Pool, full_name: &str, short_name: &str) -> Result<Vec<CommitteeRecord>, AddCommitteeError> {
+pub async fn add_committee(
+    pool: &Pool,
+    full_name: &str,
+    short_name: &str,
+) -> Result<Vec<CommitteeRecord>, AddCommitteeError> {
     let mut tx = pool.begin().await?;
     sqlx::query!(
         "
@@ -73,7 +80,7 @@ pub async fn add_committee(pool: &Pool, full_name: &str, short_name: &str) -> Re
 pub enum RenameCommitteeError {
     NotFound,
     Duplicate,
-    Other(sqlx::Error)
+    Other(sqlx::Error),
 }
 
 impl From<sqlx::Error> for RenameCommitteeError {
@@ -82,7 +89,12 @@ impl From<sqlx::Error> for RenameCommitteeError {
     }
 }
 
-pub async fn rename_committee(pool: &Pool, id: i32, new_full_name: &str, new_short_name: &str) -> Result<Vec<CommitteeRecord>, RenameCommitteeError> {
+pub async fn rename_committee(
+    pool: &Pool,
+    id: i32,
+    new_full_name: &str,
+    new_short_name: &str,
+) -> Result<Vec<CommitteeRecord>, RenameCommitteeError> {
     let mut tx = pool.begin().await?;
     let update_result = sqlx::query!(
         "
@@ -129,7 +141,10 @@ impl From<sqlx::Error> for DeleteCommitteeError {
     }
 }
 
-pub async fn delete_committee(pool: &Pool, id: i32) -> Result<Vec<CommitteeRecord>, DeleteCommitteeError> {
+pub async fn delete_committee(
+    pool: &Pool,
+    id: i32,
+) -> Result<Vec<CommitteeRecord>, DeleteCommitteeError> {
     let mut tx = pool.begin().await?;
 
     let result = sqlx::query!(
@@ -152,4 +167,21 @@ pub async fn delete_committee(pool: &Pool, id: i32) -> Result<Vec<CommitteeRecor
     tx.commit().await?;
 
     Ok(committees)
+}
+
+#[derive(FromRow, Serialize)]
+pub struct UserRecord {
+    pub id: i32,
+    pub time: DateTime<Utc>,
+    pub full_name: String,
+    pub chapter_email_address: String,
+}
+
+pub async fn get_user_from_id<'e, E>(executor: E, id: i32) -> Result<UserRecord, sqlx::Error>
+where
+    E: Executor<'e, Database = Postgres>,
+{
+    sqlx::query_as!(UserRecord, "SELECT * FROM user_details WHERE id = $1", id)
+        .fetch_one(executor)
+        .await
 }

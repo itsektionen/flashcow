@@ -21,6 +21,10 @@ features = ["full"]
 version = "1.0"
 features = ["derive"]
 
+[dependencies.chrono]
+version = "0.4.*"
+features = ["serde"]
+
 [dependencies.sqlx]
 version = "0.8"
-features = ["postgres", "runtime-tokio", "macros"]
+features = ["postgres", "runtime-tokio", "macros", "chrono"]
