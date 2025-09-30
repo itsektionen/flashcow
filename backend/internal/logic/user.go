@@ -1,1 +1,5 @@
 package logic
+
+func createUser() {
+
+}
