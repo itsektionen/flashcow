@@ -4,15 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"github.com/itsektionen/flashcow/backend/internal"
+	"github.com/itsektionen/flashcow/backend/internal/logic"
 )
 
 type UserHandler struct {
-}
-
-type User struct {
-	ID                  int64  `json:"id"`
-	FullName            string `json:"full_name"`
-	ChapterEmailAddress string `json:"chapter_email_address"`
+	Service *logic.Service
 }
 
 func (UserHandler) listUsers(w http.ResponseWriter, r *http.Request) {
@@ -25,16 +23,22 @@ func (UserHandler) getUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (UserHandler) createUser(w http.ResponseWriter, r *http.Request) {
-	u := &User{}
+func (s *UserHandler) createUser(w http.ResponseWriter, r *http.Request) {
+	u := &internal.User{}
 
 	if err := json.NewDecoder(r.Body).Decode(u); err != nil {
 		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
+		return
 	}
 
-	u.ID = 4 // Decided by random dice roll
+	user, err := s.Service.CreateUser(*u)
 
-	response(w, u, http.StatusOK)
+	if err != nil {
+		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	response(w, user, http.StatusOK)
 }
 
 func (UserHandler) updateUser(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +47,7 @@ func (UserHandler) updateUser(w http.ResponseWriter, r *http.Request) {
 		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
 		return
 	}
-	u := &User{}
+	u := &internal.User{}
 
 	if err := json.NewDecoder(r.Body).Decode(u); err != nil {
 		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
