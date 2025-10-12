@@ -1,4 +1,4 @@
-FROM golang:1.25
+FROM golang:1.25-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -7,8 +7,13 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN go build -v -o /usr/local/bin/app ./main.go
+
+RUN go build -v -o /usr/local/bin/flashcow ./main.go
+
+FROM alpine
+
+COPY --from=builder /usr/local/bin/flashcow /usr/local/bin/flashcow
 
 EXPOSE 80
 
-CMD ["app"]
+CMD ["/usr/local/bin/flashcow"]

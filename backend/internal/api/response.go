@@ -2,12 +2,15 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
+
+	"github.com/itsektionen/flashcow/backend/internal/storage"
 )
 
 func response(w http.ResponseWriter, data any, status int) {
-	if response == nil {
+	if data == nil {
 		w.WriteHeader(status)
 		return
 	}
@@ -19,4 +22,22 @@ func response(w http.ResponseWriter, data any, status int) {
 		slog.Error("Could not write response")
 		return
 	}
+}
+
+type httpError struct {
+	Message string `json:"msg"`
+}
+
+func errorResponse(w http.ResponseWriter, err error) {
+	statusCode := http.StatusInternalServerError
+	switch {
+	case errors.Is(err, storage.ErrNotFound):
+		statusCode = http.StatusNotFound
+	}
+
+	slog.Error("error serving request", "err", err, "status_code", statusCode)
+
+	e := &httpError{Message: err.Error()}
+
+	response(w, e, statusCode)
 }

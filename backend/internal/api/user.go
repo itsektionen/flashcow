@@ -10,20 +10,32 @@ import (
 )
 
 type UserHandler struct {
-	Service *logic.Service
+	UserService *logic.UserService
 }
 
-func (UserHandler) listUsers(w http.ResponseWriter, r *http.Request) {
+func (*UserHandler) listUsers(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (UserHandler) getUser(w http.ResponseWriter, r *http.Request) {
-	//id := r.PathValue("id")
+func (h *UserHandler) getUser(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 
-	w.WriteHeader(http.StatusOK)
+	if err != nil {
+		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.UserService.GetUser(r.Context(), id)
+
+	if err != nil {
+		errorResponse(w, err)
+		return
+	}
+
+	response(w, user, http.StatusOK)
 }
 
-func (s *UserHandler) createUser(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) createUser(w http.ResponseWriter, r *http.Request) {
 	u := &internal.User{}
 
 	if err := json.NewDecoder(r.Body).Decode(u); err != nil {
@@ -31,17 +43,17 @@ func (s *UserHandler) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := s.Service.CreateUser(*u)
-
+	user, err := h.UserService.CreateUser(r.Context(), *u)
 	if err != nil {
-		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
+		errorResponse(w, err)
+
 		return
 	}
 
 	response(w, user, http.StatusOK)
 }
 
-func (UserHandler) updateUser(w http.ResponseWriter, r *http.Request) {
+func (*UserHandler) updateUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
 		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
@@ -59,7 +71,7 @@ func (UserHandler) updateUser(w http.ResponseWriter, r *http.Request) {
 	response(w, u, http.StatusOK)
 }
 
-func (UserHandler) deleteUser(w http.ResponseWriter, r *http.Request) {
+func (*UserHandler) deleteUser(w http.ResponseWriter, r *http.Request) {
 	//id := r.PathValue("id")
 
 	w.WriteHeader(http.StatusOK)
