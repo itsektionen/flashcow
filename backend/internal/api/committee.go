@@ -5,6 +5,9 @@ import "net/http"
 type CommitteeHandler struct {
 }
 
+// TODO: Add all committees or call our global datastore (if we have one)
+var committees = [][]string{{"ITK", "ITerativa Klubben"}, {"QMISK", "Qlubbmästeriet IT-Sektionen Kista"}, {"TMEIT", "TraditionsMEsterIT"}, {"SMN", "Studiemiljönämnden"}}
+
 func (CommitteeHandler) getCommittees(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
+	response(w, committees, http.StatusOK)
 }
