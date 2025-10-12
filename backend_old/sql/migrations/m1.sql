@@ -8,9 +8,9 @@ CREATE TABLE committee (
 
 CREATE TABLE user_details (
 	id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	time timestamptz NOT NULL,
+	time timestamptz NOT NULL DEFAULT current_timestamp,
 	full_name text NOT NULL,
-	chapter_email_address text UNIQUE NOT NULL
+	chapter_email text UNIQUE NOT NULL
 );
 
 CREATE TABLE receipt_report (
