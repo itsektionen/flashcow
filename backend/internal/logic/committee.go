@@ -3,11 +3,11 @@ package logic
 import (
 	"context"
 
-	"github.com/itsektionen/flashcow/backend/internal/storage"
+	"github.com/itsektionen/flashcow/backend/internal/repository"
 )
 
 type CommitteeService struct {
-	Database *storage.Database
+	Database *repository.Database
 }
 
 func (s *CommitteeService) GetCommittees(ctx context.Context) ([][]string, error) {

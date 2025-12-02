@@ -5,11 +5,11 @@ import (
 	"log/slog"
 
 	"github.com/itsektionen/flashcow/backend/internal"
-	"github.com/itsektionen/flashcow/backend/internal/storage"
+	"github.com/itsektionen/flashcow/backend/internal/repository"
 )
 
 type UserService struct {
-	Database *storage.Database
+	Database *repository.Database
 }
 
 func (s *UserService) CreateUser(ctx context.Context, user internal.User) (*internal.User, error) {

@@ -7,7 +7,7 @@ import (
 
 	"github.com/itsektionen/flashcow/backend/internal/api"
 	"github.com/itsektionen/flashcow/backend/internal/logic"
-	"github.com/itsektionen/flashcow/backend/internal/storage"
+	"github.com/itsektionen/flashcow/backend/internal/repository"
 
 	// import the dialect in both goqu and sql (pq)
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
@@ -28,7 +28,7 @@ func main() {
 		_ = dbConn.Close()
 	}()
 
-	db := &storage.Database{
+	db := &repository.Database{
 		Conn: dbConn,
 	}
 

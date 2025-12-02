@@ -1,7 +1,9 @@
 package logic
 
-import "github.com/itsektionen/flashcow/backend/internal/storage"
+import (
+	"github.com/itsektionen/flashcow/backend/internal/repository"
+)
 
 type Service struct {
-	Repo *storage.Database
+	Repo *repository.Database
 }
