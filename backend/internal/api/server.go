@@ -8,8 +8,9 @@ import (
 )
 
 type Server struct {
-	Addr        string
-	UserService *logic.UserService
+	Addr             string
+	UserService      *logic.UserService
+	CommitteeService *logic.CommitteeService
 }
 
 func (s *Server) Serve() error {
@@ -26,7 +27,7 @@ func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 
 	userHandler := UserHandler{UserService: s.UserService}
-	committeeHandler := CommitteeHandler{}
+	committeeHandler := CommitteeHandler{CommitteeService: s.CommitteeService}
 
 	mux.HandleFunc("GET /api/user", userHandler.listUsers)
 	mux.HandleFunc("POST /api/user", userHandler.createUser)

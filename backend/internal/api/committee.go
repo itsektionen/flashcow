@@ -1,13 +1,21 @@
 package api
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/itsektionen/flashcow/backend/internal/logic"
+)
 
 type CommitteeHandler struct {
+	CommitteeService *logic.CommitteeService
 }
 
-// TODO: Add all committees or call our global datastore (if we have one)
-var committees = [][]string{{"ITK", "ITerativa Klubben"}, {"QMISK", "Qlubbmästeriet IT-Sektionen Kista"}, {"TMEIT", "TraditionsMEsterIT"}, {"SMN", "Studiemiljönämnden"}}
+func (h *CommitteeHandler) getCommittees(w http.ResponseWriter, r *http.Request) {
+	committees, err := h.CommitteeService.GetCommittees(r.Context())
 
-func (CommitteeHandler) getCommittees(w http.ResponseWriter, r *http.Request) {
+	if err != nil {
+		response(w, map[string]string{"msg": err.Error()}, http.StatusInternalServerError)
+	}
+
 	response(w, committees, http.StatusOK)
 }
