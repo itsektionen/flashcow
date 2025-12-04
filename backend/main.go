@@ -18,7 +18,7 @@ func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, nil)))
 
 	//dbConn, err := sql.Open("postgres", os.Getenv("POSTGRES_DSN"))
-	dbConn, err := sql.Open("postgres", "postgres://user:password@127.0.0.1:5432/flashcow?sslmode=disable")
+	dbConn, err := sql.Open("postgres", "postgres://dev:dev@127.0.0.1:5432/flashcow?sslmode=disable")
 	if err != nil {
 		slog.Error("Could not connect to database", "error", err)
 		os.Exit(1)
