@@ -29,9 +29,5 @@ func (r *CommitteeRepository) GetCommittee(ctx context.Context, id int64) (*mode
 
 	committee := &committees[idx]
 
-	if committee == nil {
-		return nil, ErrNotFound
-	}
-
 	return committee, nil
 }
