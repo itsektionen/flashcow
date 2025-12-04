@@ -1,4 +1,4 @@
-package logic
+package service
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 )
 
 type UserService struct {
-	Database *repository.Database
+	Repository *repository.UserRepository
 }
 
 func (s *UserService) CreateUser(ctx context.Context, user internal.User) (*internal.User, error) {
@@ -17,7 +17,7 @@ func (s *UserService) CreateUser(ctx context.Context, user internal.User) (*inte
 
 	slog.Info("Creating user", user.FullName, user.ChapterEmailAddress)
 
-	if err := s.Database.CreateUser(ctx, &user); err != nil {
+	if err := s.Repository.CreateUser(ctx, &user); err != nil {
 		return nil, err
 	}
 
@@ -27,5 +27,5 @@ func (s *UserService) CreateUser(ctx context.Context, user internal.User) (*inte
 func (s *UserService) GetUser(ctx context.Context, id int64) (*internal.User, error) {
 	// TODO: Authentication?
 
-	return s.Database.GetUser(ctx, id)
+	return s.Repository.GetUser(ctx, id)
 }

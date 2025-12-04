@@ -6,11 +6,11 @@ import (
 	"strconv"
 
 	"github.com/itsektionen/flashcow/backend/internal"
-	"github.com/itsektionen/flashcow/backend/internal/logic"
+	"github.com/itsektionen/flashcow/backend/internal/service"
 )
 
 type UserHandler struct {
-	UserService *logic.UserService
+	UserService *service.UserService
 }
 
 func (*UserHandler) listUsers(w http.ResponseWriter, r *http.Request) {

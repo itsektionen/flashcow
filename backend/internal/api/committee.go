@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/itsektionen/flashcow/backend/internal/logic"
+	"github.com/itsektionen/flashcow/backend/internal/service"
 )
 
 type CommitteeHandler struct {
-	CommitteeService *logic.CommitteeService
+	CommitteeService *service.CommitteeService
 }
 
 func (h *CommitteeHandler) listCommittees(w http.ResponseWriter, r *http.Request) {

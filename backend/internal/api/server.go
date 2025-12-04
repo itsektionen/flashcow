@@ -4,13 +4,13 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/itsektionen/flashcow/backend/internal/logic"
+	"github.com/itsektionen/flashcow/backend/internal/service"
 )
 
 type Server struct {
 	Addr             string
-	UserService      *logic.UserService
-	CommitteeService *logic.CommitteeService
+	UserService      *service.UserService
+	CommitteeService *service.CommitteeService
 }
 
 func (s *Server) Serve() error {

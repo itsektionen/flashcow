@@ -1,4 +1,4 @@
-package logic
+package service
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 )
 
 type CommitteeService struct {
-	Database *repository.Database
+	Repository *repository.CommitteeRepository
 }
 
 func (s *CommitteeService) ListCommittees(ctx context.Context) ([]internal.Committee, error) {
-	committees, err := s.Database.ListCommittees(ctx)
+	committees, err := s.Repository.ListCommittees(ctx)
 
 	if err != nil {
 		return nil, err
@@ -22,5 +22,5 @@ func (s *CommitteeService) ListCommittees(ctx context.Context) ([]internal.Commi
 }
 
 func (s *CommitteeService) GetCommittee(ctx context.Context, id int64) (*internal.Committee, error) {
-	return s.Database.GetCommittee(ctx, id)
+	return s.Repository.GetCommittee(ctx, id)
 }

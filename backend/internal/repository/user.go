@@ -7,8 +7,12 @@ import (
 	"github.com/itsektionen/flashcow/backend/internal"
 )
 
-func (db *Database) CreateUser(ctx context.Context, user *internal.User) error {
-	exec := db.handle().Insert("user_details").Cols("full_name", "chapter_email").Vals(
+type UserRepository struct {
+	Db *Database
+}
+
+func (r *UserRepository) CreateUser(ctx context.Context, user *internal.User) error {
+	exec := r.Db.handle().Insert("user_details").Cols("full_name", "chapter_email").Vals(
 		goqu.Vals{user.FullName, user.ChapterEmailAddress}).Returning(
 		goqu.L("id")).Executor()
 
@@ -24,8 +28,8 @@ func (db *Database) CreateUser(ctx context.Context, user *internal.User) error {
 	return nil
 }
 
-func (db *Database) GetUser(ctx context.Context, id int64) (*internal.User, error) {
-	exec := db.handle().From("user_details").Select("id", "full_name", "chapter_email").Where(goqu.Ex{"id": id}).Executor()
+func (r *UserRepository) GetUser(ctx context.Context, id int64) (*internal.User, error) {
+	exec := r.Db.handle().From("user_details").Select("id", "full_name", "chapter_email").Where(goqu.Ex{"id": id}).Executor()
 
 	user := &internal.User{}
 	if found, err := exec.ScanStructContext(ctx, user); err != nil {
