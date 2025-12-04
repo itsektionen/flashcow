@@ -4,26 +4,26 @@ import (
 	"context"
 	"slices"
 
-	"github.com/itsektionen/flashcow/backend/internal"
+	"github.com/itsektionen/flashcow/backend/internal/model"
 )
 
 type CommitteeRepository struct {
 }
 
 // TODO: Add all committees or call our global datastore (if we have one)
-var committees = []internal.Committee{
+var committees = []model.Committee{
 	{ID: 1, ShortName: "ITK", Name: "ITerativa Klubben"},
 	{ID: 2, ShortName: "QMISK", Name: "QlubbMästeriet IT-Sektionen Kista"},
 	{ID: 3, ShortName: "TMEIT", Name: "TraditionsMEsterIT"},
 	{ID: 4, ShortName: "SMN", Name: "Studiemiljönämnden"},
 }
 
-func (r *CommitteeRepository) ListCommittees(ctx context.Context) ([]internal.Committee, error) {
+func (r *CommitteeRepository) ListCommittees(ctx context.Context) ([]model.Committee, error) {
 	return committees, nil
 }
 
-func (r *CommitteeRepository) GetCommittee(ctx context.Context, id int64) (*internal.Committee, error) {
-	idx := slices.IndexFunc(committees, func(c internal.Committee) bool {
+func (r *CommitteeRepository) GetCommittee(ctx context.Context, id int64) (*model.Committee, error) {
+	idx := slices.IndexFunc(committees, func(c model.Committee) bool {
 		return c.ID == id
 	})
 

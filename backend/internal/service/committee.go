@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/itsektionen/flashcow/backend/internal"
+	"github.com/itsektionen/flashcow/backend/internal/model"
 	"github.com/itsektionen/flashcow/backend/internal/repository"
 )
 
@@ -11,7 +11,7 @@ type CommitteeService struct {
 	Repository *repository.CommitteeRepository
 }
 
-func (s *CommitteeService) ListCommittees(ctx context.Context) ([]internal.Committee, error) {
+func (s *CommitteeService) ListCommittees(ctx context.Context) ([]model.Committee, error) {
 	committees, err := s.Repository.ListCommittees(ctx)
 
 	if err != nil {
@@ -21,6 +21,6 @@ func (s *CommitteeService) ListCommittees(ctx context.Context) ([]internal.Commi
 	return committees, nil
 }
 
-func (s *CommitteeService) GetCommittee(ctx context.Context, id int64) (*internal.Committee, error) {
+func (s *CommitteeService) GetCommittee(ctx context.Context, id int64) (*model.Committee, error) {
 	return s.Repository.GetCommittee(ctx, id)
 }
