@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/itsektionen/flashcow/backend/internal/storage"
+	"github.com/itsektionen/flashcow/backend/internal/repository"
 )
 
 func response(w http.ResponseWriter, data any, status int) {
@@ -31,7 +31,7 @@ type httpError struct {
 func errorResponse(w http.ResponseWriter, err error) {
 	statusCode := http.StatusInternalServerError
 	switch {
-	case errors.Is(err, storage.ErrNotFound):
+	case errors.Is(err, repository.ErrNotFound):
 		statusCode = http.StatusNotFound
 	}
 

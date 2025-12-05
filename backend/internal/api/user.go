@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/itsektionen/flashcow/backend/internal"
-	"github.com/itsektionen/flashcow/backend/internal/logic"
+	"github.com/itsektionen/flashcow/backend/internal/model"
+	"github.com/itsektionen/flashcow/backend/internal/service"
 )
 
 type UserHandler struct {
-	UserService *logic.UserService
+	UserService *service.UserService
 }
 
 func (*UserHandler) listUsers(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +36,7 @@ func (h *UserHandler) getUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) createUser(w http.ResponseWriter, r *http.Request) {
-	u := &internal.User{}
+	u := &model.User{}
 
 	if err := json.NewDecoder(r.Body).Decode(u); err != nil {
 		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
@@ -59,7 +59,7 @@ func (*UserHandler) updateUser(w http.ResponseWriter, r *http.Request) {
 		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
 		return
 	}
-	u := &internal.User{}
+	u := &model.User{}
 
 	if err := json.NewDecoder(r.Body).Decode(u); err != nil {
 		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)

@@ -4,12 +4,13 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/itsektionen/flashcow/backend/internal/logic"
+	"github.com/itsektionen/flashcow/backend/internal/service"
 )
 
 type Server struct {
-	Addr        string
-	UserService *logic.UserService
+	Addr             string
+	UserService      *service.UserService
+	CommitteeService *service.CommitteeService
 }
 
 func (s *Server) Serve() error {
@@ -26,7 +27,7 @@ func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 
 	userHandler := UserHandler{UserService: s.UserService}
-	committeeHandler := CommitteeHandler{}
+	committeeHandler := CommitteeHandler{CommitteeService: s.CommitteeService}
 
 	mux.HandleFunc("GET /api/user", userHandler.listUsers)
 	mux.HandleFunc("POST /api/user", userHandler.createUser)
@@ -35,7 +36,8 @@ func (s *Server) Handler() http.Handler {
 	//mux.HandleFunc("PUT /api/user/{id}", userHandler.updateUser)
 	//mux.HandleFunc("DELETE /api/user/{id}", userHandler.deleteUser)
 
-	mux.HandleFunc("GET /api/committee", committeeHandler.getCommittees)
+	mux.HandleFunc("GET /api/committee", committeeHandler.listCommittees)
+	mux.HandleFunc("GET /api/committee/{id}", committeeHandler.getCommittee)
 
 	return mux
 }

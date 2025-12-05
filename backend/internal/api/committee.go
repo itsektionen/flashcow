@@ -1,13 +1,40 @@
 package api
 
-import "net/http"
+import (
+	"net/http"
+	"strconv"
+
+	"github.com/itsektionen/flashcow/backend/internal/service"
+)
 
 type CommitteeHandler struct {
+	CommitteeService *service.CommitteeService
 }
 
-// TODO: Add all committees or call our global datastore (if we have one)
-var committees = [][]string{{"ITK", "ITerativa Klubben"}, {"QMISK", "Qlubbmästeriet IT-Sektionen Kista"}, {"TMEIT", "TraditionsMEsterIT"}, {"SMN", "Studiemiljönämnden"}}
+func (h *CommitteeHandler) listCommittees(w http.ResponseWriter, r *http.Request) {
+	committees, err := h.CommitteeService.ListCommittees(r.Context())
 
-func (CommitteeHandler) getCommittees(w http.ResponseWriter, r *http.Request) {
+	if err != nil {
+		response(w, map[string]string{"msg": err.Error()}, http.StatusInternalServerError)
+	}
+
 	response(w, committees, http.StatusOK)
+}
+
+func (h *CommitteeHandler) getCommittee(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+
+	if err != nil {
+		response(w, map[string]string{"msg": err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	committee, err := h.CommitteeService.GetCommittee(r.Context(), id)
+
+	if err != nil {
+		errorResponse(w, err)
+		return
+	}
+
+	response(w, committee, http.StatusOK)
 }

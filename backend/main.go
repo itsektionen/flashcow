@@ -6,8 +6,9 @@ import (
 	"os"
 
 	"github.com/itsektionen/flashcow/backend/internal/api"
-	"github.com/itsektionen/flashcow/backend/internal/logic"
-	"github.com/itsektionen/flashcow/backend/internal/storage"
+	"github.com/itsektionen/flashcow/backend/internal/repository"
+	"github.com/itsektionen/flashcow/backend/internal/service"
+
 	// import the dialect in both goqu and sql (pq)
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
 	_ "github.com/lib/pq"
@@ -27,7 +28,7 @@ func main() {
 		_ = dbConn.Close()
 	}()
 
-	db := &storage.Database{
+	db := &repository.Database{
 		Conn: dbConn,
 	}
 
@@ -37,13 +38,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	s := &logic.UserService{
-		Database: db,
+	userRepository := &repository.UserRepository{
+		Db: db,
+	}
+
+	committeeRepository := &repository.CommitteeRepository{}
+
+	userService := &service.UserService{
+		Repository: userRepository,
+	}
+
+	committeeService := &service.CommitteeService{
+		Repository: committeeRepository,
 	}
 
 	srv := &api.Server{
-		Addr:        ":80",
-		UserService: s,
+		Addr:             ":8080",
+		UserService:      userService,
+		CommitteeService: committeeService,
 	}
 
 	if err := srv.Serve(); err != nil {
