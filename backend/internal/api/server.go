@@ -26,8 +26,8 @@ func (s *Server) Serve() error {
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 
-	userHandler := UserHandler{UserService: s.UserService}
-	committeeHandler := CommitteeHandler{CommitteeService: s.CommitteeService}
+	userHandler := UserHandler{userService: *s.UserService}
+	committeeHandler := CommitteeHandler{committeeService: *s.CommitteeService}
 
 	mux.HandleFunc("GET /api/user", userHandler.listUsers)
 	mux.HandleFunc("POST /api/user", userHandler.createUser)

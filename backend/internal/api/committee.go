@@ -8,11 +8,11 @@ import (
 )
 
 type CommitteeHandler struct {
-	CommitteeService *service.CommitteeService
+	committeeService service.CommitteeService
 }
 
 func (h *CommitteeHandler) listCommittees(w http.ResponseWriter, r *http.Request) {
-	committees, err := h.CommitteeService.ListCommittees(r.Context())
+	committees, err := h.committeeService.ListCommittees(r.Context())
 
 	if err != nil {
 		response(w, map[string]string{"msg": err.Error()}, http.StatusInternalServerError)
@@ -29,7 +29,7 @@ func (h *CommitteeHandler) getCommittee(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	committee, err := h.CommitteeService.GetCommittee(r.Context(), id)
+	committee, err := h.committeeService.GetCommittee(r.Context(), id)
 
 	if err != nil {
 		errorResponse(w, err)
