@@ -10,11 +10,18 @@ import (
 )
 
 type UserHandler struct {
-	UserService *service.UserService
+	userService service.UserService
 }
 
-func (*UserHandler) listUsers(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
+func (h *UserHandler) listUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := h.userService.ListUsers(r.Context())
+
+	if err != nil {
+		errorResponse(w, err)
+		return
+	}
+
+	response(w, users, http.StatusOK)
 }
 
 func (h *UserHandler) getUser(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +32,7 @@ func (h *UserHandler) getUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.UserService.GetUser(r.Context(), id)
+	user, err := h.userService.GetUser(r.Context(), id)
 
 	if err != nil {
 		errorResponse(w, err)
@@ -43,7 +50,7 @@ func (h *UserHandler) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.UserService.CreateUser(r.Context(), *u)
+	user, err := h.userService.CreateUser(r.Context(), *u)
 	if err != nil {
 		errorResponse(w, err)
 

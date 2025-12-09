@@ -38,24 +38,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	userRepository := &repository.UserRepository{
-		Db: db,
-	}
+	userRepository := repository.NewUserRepository(
+		db,
+	)
 
-	committeeRepository := &repository.CommitteeRepository{}
+	committeeRepository := repository.NewCommitteeRepository()
 
-	userService := &service.UserService{
-		Repository: userRepository,
-	}
+	userService := service.NewUserService(userRepository)
 
-	committeeService := &service.CommitteeService{
-		Repository: committeeRepository,
-	}
+	committeeService := service.NewCommitteeService(committeeRepository)
 
 	srv := &api.Server{
 		Addr:             ":8080",
-		UserService:      userService,
-		CommitteeService: committeeService,
+		UserService:      &userService,
+		CommitteeService: &committeeService,
 	}
 
 	if err := srv.Serve(); err != nil {

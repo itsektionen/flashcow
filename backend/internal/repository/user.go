@@ -7,11 +7,23 @@ import (
 	"github.com/itsektionen/flashcow/backend/internal/model"
 )
 
-type UserRepository struct {
+type UserRepository interface {
+	CreateUser(ctx context.Context, user *model.User) error
+	GetUser(ctx context.Context, id int64) (*model.User, error)
+	ListUsers(ctx context.Context) ([]model.User, error)
+}
+
+type userRepository struct {
 	Db *Database
 }
 
-func (r *UserRepository) CreateUser(ctx context.Context, user *model.User) error {
+func NewUserRepository(db *Database) UserRepository {
+	return &userRepository{
+		Db: db,
+	}
+}
+
+func (r *userRepository) CreateUser(ctx context.Context, user *model.User) error {
 	exec := r.Db.handle().Insert("user_details").Cols("full_name", "chapter_email").Vals(
 		goqu.Vals{user.FullName, user.ChapterEmailAddress}).Returning(
 		goqu.L("id")).Executor()
@@ -28,7 +40,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *model.User) error
 	return nil
 }
 
-func (r *UserRepository) GetUser(ctx context.Context, id int64) (*model.User, error) {
+func (r *userRepository) GetUser(ctx context.Context, id int64) (*model.User, error) {
 	exec := r.Db.handle().From("user_details").Select("id", "full_name", "chapter_email").Where(goqu.Ex{"id": id}).Executor()
 
 	user := &model.User{}
@@ -39,4 +51,15 @@ func (r *UserRepository) GetUser(ctx context.Context, id int64) (*model.User, er
 	}
 
 	return user, nil
+}
+
+func (r *userRepository) ListUsers(ctx context.Context) ([]model.User, error) {
+	exec := r.Db.handle().From("user_details").Select("id", "full_name", "chapter_email").Executor()
+
+	users := []model.User{}
+	if err := exec.ScanStructsContext(ctx, &users); err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
