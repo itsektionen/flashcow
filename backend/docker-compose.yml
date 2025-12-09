@@ -1,0 +1,25 @@
+services:
+  database:
+    image: "postgres:latest"
+
+    # By default, a Postgres database is running on the 5432 port.
+    ports:
+      - 5432:5432
+
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: flashcow
+
+#  api:
+#    depends_on:
+#      - database
+#
+#    ports:
+#      - 127.0.0.1:8080:80
+#
+#    environment:
+#      POSTGRES_DSN: "postgres://dev:dev@database:5432/flashcow?sslmode=disable"
+#
+#    build:
+#      dockerfile: ./Dockerfile

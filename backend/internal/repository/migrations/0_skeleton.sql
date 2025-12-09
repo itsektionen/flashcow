@@ -1,16 +1,21 @@
-BEGIN;
+CREATE TABLE migrations (
+    filename text NOT NULL,
+    migrated_at timestamptz NOT NULL DEFAULT current_timestamp
+);
+
 CREATE TABLE committee (
 	id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	full_name text NOT NULL,
 	short_name text NOT NULL,
-	deleted timestamptz
+	created_at timestamptz NOT NULL DEFAULT current_timestamp,
+    deleted timestamptz
 );
 
 CREATE TABLE user_details (
 	id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	time timestamptz NOT NULL,
+	time timestamptz NOT NULL DEFAULT current_timestamp,
 	full_name text NOT NULL,
-	chapter_email_address text UNIQUE NOT NULL
+	chapter_email text UNIQUE NOT NULL
 );
 
 CREATE TABLE receipt_report (
@@ -28,15 +33,16 @@ CREATE TABLE receipt_report (
 	spirits_total int NOT NULL,
 	material_total int NOT NULL,
 	other_total int NOT NULL,
-	internrep_totel int NOT NULL,
+	internrep_total int NOT NULL,
 	comments text NOT NULL,
 	image bytea NOT NULL
 );
 
-CREATE TABLE migrations (
-	migration_id int PRIMARY KEY
+CREATE TYPE receipt_status AS ENUM ('created', 'accepted', 'denied', 'deleted');
+
+CREATE TABLE receipt_status_changes (
+    id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    changed_by int NOT NULL REFERENCES user_details(id),
+    changed_at timestamptz NOT NULL DEFAULT current_timestamp,
+    new_status receipt_status NOT NULL
 );
-
-INSERT INTO migrations VALUES (1);
-
-COMMIT;
